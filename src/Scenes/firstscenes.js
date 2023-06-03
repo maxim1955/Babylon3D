@@ -6,15 +6,14 @@ import {
     ArcRotateCamera,
     Color3,
     Engine,
+    ExecuteCodeAction,
     GizmoManager,
     InterpolateValueAction,
     MeshBuilder,
-    PlaneRotationGizmo,
     PointLight,
     Scene,
     StandardMaterial,
     Texture,
-    UtilityLayerRenderer,
     Vector3
 } from "@babylonjs/core"
 
@@ -39,7 +38,7 @@ const createScene = (canvas) => {
     */
 
     const light = new PointLight("light", new Vector3(10, 10, 0), scene);
-    light.intensity = 0.5
+    light.intensity = 0.6
 
     /*
     ----------------------------------------- PLATFORMS ---------------------------------
@@ -108,9 +107,6 @@ const createScene = (canvas) => {
     */
 
     const gizmoManager = new GizmoManager(scene)
-    const utilLayer = new UtilityLayerRenderer(scene);
-    const gizmo = new PlaneRotationGizmo(new Vector3(0, 1, 0));
-
     /*
     -------------------------------- TEST-- AddEventListener BTN ---TEST  -------------------------
     */
@@ -118,20 +114,33 @@ const createScene = (canvas) => {
     PositionBtn.addEventListener('click', () => {
         gizmoManager.positionGizmoEnabled = !gizmoManager.positionGizmoEnabled
         if (gizmoManager.positionGizmoEnabled) {
+            PositionBtn.classList.add('bg-green')
+            rotateBtn.classList.remove('bg-green')
+            scaleBtn.classList.remove('bg-green')
+            boundBtn.classList.remove('bg-green')
+            cursorBtn.classList.remove('bg-green')
             gizmoManager.rotationGizmoEnabled = false
             gizmoManager.scaleGizmoEnabled = false
             gizmoManager.boundingBoxGizmoEnabled = false
+        } else {
+            PositionBtn.classList.remove('bg-green')
         }
-
     })
     const rotateBtn = document.querySelector('#rotateBtn')
     rotateBtn.addEventListener('click', () => {
         gizmoManager.rotationGizmoEnabled = !gizmoManager.rotationGizmoEnabled
         if (gizmoManager.rotationGizmoEnabled) {
+            rotateBtn.classList.add('bg-green')
+            scaleBtn.classList.remove('bg-green')
+            boundBtn.classList.remove('bg-green')
+            PositionBtn.classList.remove('bg-green')
+            cursorBtn.classList.remove('bg-green')
+
             gizmoManager.positionGizmoEnabled = false
             gizmoManager.scaleGizmoEnabled = false
             gizmoManager.boundingBoxGizmoEnabled = false
-
+        } else {
+            rotateBtn.classList.remove('bg-green')
         }
 
     })
@@ -139,19 +148,49 @@ const createScene = (canvas) => {
     scaleBtn.addEventListener('click', () => {
         gizmoManager.scaleGizmoEnabled = !gizmoManager.scaleGizmoEnabled
         if (gizmoManager.scaleGizmoEnabled) {
+            scaleBtn.classList.add('bg-green')
+            boundBtn.classList.remove('bg-green')
+            rotateBtn.classList.remove('bg-green')
+            PositionBtn.classList.remove('bg-green')
+            cursorBtn.classList.remove('bg-green')
+
             gizmoManager.positionGizmoEnabled = false
             gizmoManager.boundingBoxGizmoEnabled = false
             gizmoManager.rotationGizmoEnabled = false
+        } else {
+            scaleBtn.classList.remove('bg-green')
+
         }
+
     })
     const boundBtn = document.querySelector('#boundBtn')
     boundBtn.addEventListener('click', () => {
         gizmoManager.boundingBoxGizmoEnabled = !gizmoManager.boundingBoxGizmoEnabled
         if (gizmoManager.boundingBoxGizmoEnabled) {
+            boundBtn.classList.add('bg-green')
+            scaleBtn.classList.remove('bg-green')
+            rotateBtn.classList.remove('bg-green')
+            PositionBtn.classList.remove('bg-green')
+            cursorBtn.classList.remove('bg-green')
             gizmoManager.positionGizmoEnabled = false
             gizmoManager.rotationGizmoEnabled = false
             gizmoManager.scaleGizmoEnabled = false
+        } else {
+            boundBtn.classList.remove('bg-green')
+
         }
+    })
+    const cursorBtn = document.querySelector('#cursorBtn')
+    cursorBtn.addEventListener('click', () => {
+        cursorBtn.classList.add('bg-green')
+        gizmoManager.boundingBoxGizmoEnabled = false
+        gizmoManager.scaleGizmoEnabled = false
+        gizmoManager.rotationGizmoEnabled = false
+        gizmoManager.positionGizmoEnabled = false
+        rotateBtn.classList.remove('bg-green')
+        scaleBtn.classList.remove('bg-green')
+        boundBtn.classList.remove('bg-green')
+        PositionBtn.classList.remove('bg-green')
     })
     /*---------------------Create function----------------------------*/
     const spherebtn = document.querySelector('#addSphere')
@@ -159,6 +198,7 @@ const createScene = (canvas) => {
 
     const qubeBtn = document.querySelector('#qubeBtn')
     qubeBtn.addEventListener("click", createQube)
+
     /*
     --------------------------------------------- ACTIONS  ----------------------------------------
     */
@@ -170,14 +210,37 @@ const createScene = (canvas) => {
                 light,
                 'diffuse',
                 new Color3(0, 0, 1),
-                1000
+                500
             )
         )
         .then(
             new InterpolateValueAction(
                 ActionManager.OnPickTrigger,
-                camera,
-                '',
+                light,
+                'diffuse',
+                new Color3(1, 0, 1),
+                500,
+            )
+        )
+    platform.actionManager = new ActionManager(scene)
+    platform.actionManager
+        .registerAction(
+            new ExecuteCodeAction(
+                ActionManager.OnPickTrigger,
+                function () {
+                    light.position.set(1, 10, 0)
+                    light.intensity = 0.5
+                    scene.clearColor = new Color3(0.4, 0.2, 0.2)
+                }
+            )
+        )
+        .then(
+            new ExecuteCodeAction(
+                ActionManager.OnPickTrigger,
+                function () {
+                    light.position.set(1, 5, 0)
+                    scene.clearColor = new Color3(0.1, 0.3, 0.3)
+                }
             )
         )
 }
