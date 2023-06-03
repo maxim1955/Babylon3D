@@ -2,10 +2,12 @@
 -------------------------------------- import -----------------------------------
 */
 import {
+    ActionManager,
+    ArcRotateCamera,
     Color3,
     Engine,
-    FreeCamera,
     GizmoManager,
+    InterpolateValueAction,
     MeshBuilder,
     PlaneRotationGizmo,
     PointLight,
@@ -13,7 +15,7 @@ import {
     StandardMaterial,
     Texture,
     UtilityLayerRenderer,
-    Vector3,
+    Vector3
 } from "@babylonjs/core"
 
 const createScene = (canvas) => {
@@ -28,8 +30,9 @@ const createScene = (canvas) => {
     /*
      ----------------------------------------- Camera ---------------------------------
     */
-    const camera = new FreeCamera("camera1", new Vector3(0, 10, -12), scene);
+    const camera = new ArcRotateCamera("Camera", 0, 0, 0, new Vector3(10, 10, -12), scene);
     camera.setTarget(new Vector3(0, 0, 0));
+    camera.attachControl(canvas, true);
 
     /*
      ----------------------------------------- Lights ---------------------------------
@@ -43,9 +46,9 @@ const createScene = (canvas) => {
     */
 
     const platform = MeshBuilder.CreateBox("box", {
-            width: 6,
+            width: 10,
             height: 0,
-            depth: 6
+            depth: 10
         },
         scene
     );
@@ -68,7 +71,31 @@ const createScene = (canvas) => {
     qube.material = QubeMaterial
     QubeMaterial.emissiveTexture = new Texture('https://avatars.mds.yandex.net/i?id=c30e9794de6f15e218c3329477afd50684a4e323-8482868-images-thumbs&n=13')
     qube.position.y = 2
+    /*
+    * ---------------------------------------CREATE SECTION -------------------------------
+    */
+    /*
+    -------------- SPHERE-------------------------------- ---------------------------------
+    */
+    const createSpehere = () => {
+        const sphere = MeshBuilder.CreateSphere('spheres', {
+            segments: 10,
+            diameter: 1,
+        }, scene)
+        sphere.position.y = 4;
+    }
+    /*
+   -------------- QUBE-------------------------------- ---------------------------------
+   */
 
+    const createQube = () => {
+        const qube = MeshBuilder.CreateBox('box', {
+            width: 1,
+            height: 1,
+            depth: 1,
+        }, scene)
+        qube.position.y = 4;
+    }
     /*
     ----------------------------------------- RENDER ---------------------------------
     */
@@ -126,6 +153,33 @@ const createScene = (canvas) => {
             gizmoManager.scaleGizmoEnabled = false
         }
     })
+    /*---------------------Create function----------------------------*/
+    const spherebtn = document.querySelector('#addSphere')
+    spherebtn.addEventListener("click", createSpehere)
+
+    const qubeBtn = document.querySelector('#qubeBtn')
+    qubeBtn.addEventListener("click", createQube)
+    /*
+    --------------------------------------------- ACTIONS  ----------------------------------------
+    */
+    qube.actionManager = new ActionManager(scene);
+    qube.actionManager
+        .registerAction(
+            new InterpolateValueAction(
+                ActionManager.OnPickTrigger,
+                light,
+                'diffuse',
+                new Color3(0, 0, 1),
+                1000
+            )
+        )
+        .then(
+            new InterpolateValueAction(
+                ActionManager.OnPickTrigger,
+                camera,
+                '',
+            )
+        )
 }
 export {createScene};
 
