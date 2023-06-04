@@ -19,7 +19,7 @@
       <i class="fa-solid fa-arrows-to-dot " style="color: #2913ec;"></i>
       <label class="q-pl-md cursor-pointer">Сетка</label>
     </q-btn>
-    <q-btn size="30px" class="q-ml-md" id="cursorBtn">
+    <q-btn size="30px" class="q-ml-md bg-green" id="cursorBtn">
       <i class="fa-solid fa-arrow-pointer"></i>
       <label class="q-pl-md cursor-pointer">Курсор</label>
     </q-btn>

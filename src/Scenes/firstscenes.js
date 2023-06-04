@@ -14,7 +14,8 @@ import {
     Scene,
     StandardMaterial,
     Texture,
-    Vector3
+    Vector3,
+    CubeTexture,
 } from "@babylonjs/core"
 
 const createScene = (canvas) => {
@@ -41,6 +42,11 @@ const createScene = (canvas) => {
     light.intensity = 0.6
 
     /*
+    ---------------------------------------- SKY BOX -----------------------------------
+    */
+        const envTexture = new CubeTexture("https://assets.babylonjs.com/environments/environmentSpecular.env", scene);
+        scene.createDefaultSkybox(envTexture, true, 1000);
+    /*
     ----------------------------------------- PLATFORMS ---------------------------------
     */
 
@@ -55,7 +61,6 @@ const createScene = (canvas) => {
     BoxMaterial.emissiveTexture = new Texture('https://img2.akspic.ru/previews/8/3/5/9/6/169538/169538-chernyy-seryj_cvet-tsvetnoy-sinij-svet-550x310.jpg')
     platform.material = BoxMaterial
     platform.receiveShadows = true
-
     /*
    ----------------------------------------- Qube ---------------------------------
    */
@@ -69,12 +74,12 @@ const createScene = (canvas) => {
     const QubeMaterial = new StandardMaterial("material", scene);
     qube.material = QubeMaterial
     QubeMaterial.emissiveTexture = new Texture('https://avatars.mds.yandex.net/i?id=c30e9794de6f15e218c3329477afd50684a4e323-8482868-images-thumbs&n=13')
-    qube.position.y = 2
+    qube.position.y = 1.5
     /*
-    * ---------------------------------------CREATE SECTION -------------------------------
+    * ---------------------------------------CREATE OBJECTS SECTION -------------------------------
     */
     /*
-    -------------- SPHERE-------------------------------- ---------------------------------
+    -------------- SPHERE--------------------------------------------------------------------------
     */
     const createSpehere = () => {
         const sphere = MeshBuilder.CreateSphere('spheres', {
@@ -84,7 +89,7 @@ const createScene = (canvas) => {
         sphere.position.y = 4;
     }
     /*
-   -------------- QUBE-------------------------------- ---------------------------------
+   -------------- QUBE------------------------------------------------------------------------------
    */
 
     const createQube = () => {
@@ -93,17 +98,17 @@ const createScene = (canvas) => {
             height: 1,
             depth: 1,
         }, scene)
-        qube.position.y = 4;
+        qube.position.y = 6;
     }
     /*
-    ----------------------------------------- RENDER ---------------------------------
+    ----------------------------------------- RENDER ----------------------------------------------
     */
     engine.runRenderLoop(() => {
         scene.render();
     });
 
     /*
-    ----------------------------------------- GIZMOS ---------------------------------
+    ----------------------------------------- INITIALIZE GIZMOS -----------------------------------------------
     */
 
     const gizmoManager = new GizmoManager(scene)
@@ -177,7 +182,6 @@ const createScene = (canvas) => {
             gizmoManager.scaleGizmoEnabled = false
         } else {
             boundBtn.classList.remove('bg-green')
-
         }
     })
     const cursorBtn = document.querySelector('#cursorBtn')
@@ -228,18 +232,25 @@ const createScene = (canvas) => {
             new ExecuteCodeAction(
                 ActionManager.OnPickTrigger,
                 function () {
-                    light.position.set(1, 10, 0)
-                    light.intensity = 0.5
                     scene.clearColor = new Color3(0.4, 0.2, 0.2)
                 }
             )
         )
         .then(
             new ExecuteCodeAction(
-                ActionManager.OnPickTrigger,
+                ActionManager.OnDoublePickTrigger,
                 function () {
-                    light.position.set(1, 5, 0)
                     scene.clearColor = new Color3(0.1, 0.3, 0.3)
+                }
+            )
+        )
+    scene.actionManager = new ActionManager(scene)
+    scene.actionManager
+        .registerAction(
+            new ExecuteCodeAction(
+                ActionManager.OnDoublePickTrigger,
+                function () {
+                    gizmoManager.boundingBoxGizmoEnabled = !gizmoManager.boundingBoxGizmoEnabled
                 }
             )
         )
