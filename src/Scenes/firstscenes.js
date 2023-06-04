@@ -5,6 +5,7 @@ import {
     ActionManager,
     ArcRotateCamera,
     Color3,
+    CubeTexture,
     Engine,
     ExecuteCodeAction,
     GizmoManager,
@@ -15,7 +16,6 @@ import {
     StandardMaterial,
     Texture,
     Vector3,
-    CubeTexture,
 } from "@babylonjs/core"
 
 const createScene = (canvas) => {
@@ -44,8 +44,8 @@ const createScene = (canvas) => {
     /*
     ---------------------------------------- SKY BOX -----------------------------------
     */
-        const envTexture = new CubeTexture("https://assets.babylonjs.com/environments/environmentSpecular.env", scene);
-        scene.createDefaultSkybox(envTexture, true, 1000);
+    const envTexture = new CubeTexture("https://assets.babylonjs.com/environments/environmentSpecular.env", scene);
+    scene.createDefaultSkybox(envTexture, true, 10000);
     /*
     ----------------------------------------- PLATFORMS ---------------------------------
     */
@@ -83,11 +83,20 @@ const createScene = (canvas) => {
     */
     const createSpehere = () => {
         const sphere = MeshBuilder.CreateSphere('spheres', {
-            segments: 10,
             diameter: 1,
         }, scene)
         sphere.position.y = 4;
+        sphere.actionManager = new ActionManager(scene);
+        sphere.actionManager.registerAction(
+            new ExecuteCodeAction(
+                ActionManager.OnDoublePickTrigger,
+                function () {
+                    scene.removeMesh(sphere)
+                }
+            )
+        )
     }
+
     /*
    -------------- QUBE------------------------------------------------------------------------------
    */
@@ -99,6 +108,15 @@ const createScene = (canvas) => {
             depth: 1,
         }, scene)
         qube.position.y = 6;
+        qube.actionManager = new ActionManager(scene);
+        qube.actionManager.registerAction(
+            new ExecuteCodeAction(
+                ActionManager.OnDoublePickTrigger,
+                function () {
+                    scene.removeMesh(qube)
+                }
+            )
+        )
     }
     /*
     ----------------------------------------- RENDER ----------------------------------------------
@@ -140,7 +158,6 @@ const createScene = (canvas) => {
             boundBtn.classList.remove('bg-green')
             PositionBtn.classList.remove('bg-green')
             cursorBtn.classList.remove('bg-green')
-
             gizmoManager.positionGizmoEnabled = false
             gizmoManager.scaleGizmoEnabled = false
             gizmoManager.boundingBoxGizmoEnabled = false
@@ -250,10 +267,11 @@ const createScene = (canvas) => {
             new ExecuteCodeAction(
                 ActionManager.OnDoublePickTrigger,
                 function () {
-                    gizmoManager.boundingBoxGizmoEnabled = !gizmoManager.boundingBoxGizmoEnabled
+                    scene.removeMesh('sphere', true)
                 }
             )
         )
+
 }
 export {createScene};
 
